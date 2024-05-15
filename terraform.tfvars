@@ -1,0 +1,7 @@
+compartment_id = "your_compartment_id"
+subnet_id = "your_subnet_id"
+instance_shape = "VM.Standard2.1"
+image_id = "your_image_id"
+ssh_public_key = "your_ssh_public_key"
+vpn_cidr_block = "your_vpn_cidr_block"
+vpn_shared_secret = "your_vpn_shared_secret"
