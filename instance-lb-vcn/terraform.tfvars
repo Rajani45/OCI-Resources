@@ -1,0 +1,7 @@
+tenancy_ocid     = "ocid1.tenancy.oc1..example"
+user_ocid        = "ocid1.user.oc1..example"
+fingerprint      = "b5:2b:3c:4d:5e:6f:7g:8h:9i:0j:k1:l2:m3:n4:o5"
+private_key_path = "/path/to/private_key.pem"
+region           = "us-ashburn-1"
+compartment_ocid = "ocid1.compartment.oc1..example"
+ssh_public_key   = "/path/to/ssh_public_key.pub"
