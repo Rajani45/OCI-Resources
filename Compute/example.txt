@@ -1,0 +1,100 @@
+# provider.tf
+provider "oci" {
+  tenancy_ocid          = var.tenancy_ocid
+  user_ocid             = var.user_ocid
+  fingerprint           = var.fingerprint
+  private_key_path      = var.private_key_path
+  region                = var.region
+}
+-----------------------
+var.tf
+
+# variables.tf
+variable "tenancy_ocid" {
+  description = "The OCID of your tenancy"
+  type        = string
+}
+
+variable "user_ocid" {
+  description = "The OCID of the user"
+  type        = string
+}
+
+variable "fingerprint" {
+  description = "The fingerprint for the user's API key"
+  type        = string
+}
+
+variable "private_key_path" {
+  description = "The path to the private key file"
+  type        = string
+}
+
+variable "region" {
+  description = "The OCI region"
+  type        = string
+}
+
+variable "compartment_ocid" {
+  description = "The OCID of the compartment"
+  type        = string
+}
+
+variable "instance_display_name" {
+  description = "The display name of the instance"
+  type        = string
+  default     = "my-instance"
+}
+-----------------------------------------------------
+# terraform.tfvars
+tenancy_ocid     = "ocid1.tenancy.oc1..exampleuniqueID"
+user_ocid        = "ocid1.user.oc1..exampleuniqueID"
+fingerprint      = "example:fingerprint"
+private_key_path = "/path/to/your/private_key.pem"
+region           = "us-phoenix-1"
+compartment_ocid = "ocid1.compartment.oc1..exampleuniqueID"
+------------------------------------------------------------------
+
+# locals.tf
+locals {
+  instance_shape = "VM.Standard.E2.1.Micro"
+}
+-------------------------------------------------------------------------
+
+# data_sources.tf
+data "oci_identity_availability_domains" "ads" {
+  compartment_id = var.compartment_ocid
+}
+
+data "oci_core_images" "default_image" {
+  compartment_id = var.compartment_ocid
+  operating_system = "Oracle Linux"
+  operating_system_version = "7.9"
+  most_recent = true
+}
+------------------
+# main.tf
+resource "oci_core_instance" "instance" {
+  availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
+  compartment_id      = var.compartment_ocid
+  shape               = local.instance_shape
+  display_name        = var.instance_display_name
+
+  create_vnic_details {
+    subnet_id = var.subnet_id
+  }
+
+  source_details {
+    source_type = "image"
+    source_id   = data.oci_core_images.default_image.images[0].id
+  }
+}
+----------------------------------------
+# outputs.tf
+output "instance_id" {
+  value = oci_core_instance.instance.id
+}
+
+output "instance_public_ip" {
+  value = oci_core_instance.instance.public_ip
+}
