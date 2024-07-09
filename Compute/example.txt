@@ -52,13 +52,16 @@ variable "instance_display_name" {
 
 
 # terraform.tfvars
-tenancy_ocid     = "ocid1.tenancy.oc1..exampleuniqueID"
-user_ocid        = "ocid1.user.oc1..exampleuniqueID"
-fingerprint      = "example:fingerprint"
-private_key_path = "/path/to/your/private_key.pem"
-region           = "us-phoenix-1"
-compartment_ocid = "ocid1.compartment.oc1..exampleuniqueID"
-subnet_id        = "ocid1.subnet.oc1..exampleuniqueID"
+
+
+tenancy_ocid     =  "ocid1.tenancy.oc1..aaaaaaaah37emgvabx6snkmzzbcbwaatntd4pu7nh2h46jjb7jfomusn7xna"
+user_ocid        =  "ocid1.user.oc1..aaaaaaaavcrqgcbls6mkqg55hdg72ejih7m42emykyege4cbtvchpywlgfbq"
+fingerprint      =  "96:6f:74:bb:94:3a:68:66:29:37:d6:2c:35:30:27:e5"
+private_key_path =  "/home/opc/scripts-oci/practice"
+region           =  "ap-hyderabad-1"
+compartment_id   =  "ocid1.tenancy.oc1..aaaaaaaah37emgvabx6snkmzzbcbwaatntd4pu7nh2h46jjb7jfomusn7xna"
+subnet_ocid      =  "ocid1.subnet.oc1.eu-zurich-1.aaaaaaaamv6irqacyfjat6rkii4dwq2hvcrgq4jwudpryzpi2v3fdo3mt57q"
+
 
 
 # locals.tf
