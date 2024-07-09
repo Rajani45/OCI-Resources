@@ -6,8 +6,6 @@ provider "oci" {
   private_key_path      = var.private_key_path
   region                = var.region
 }
------------------------
-var.tf
 
 # variables.tf
 variable "tenancy_ocid" {
@@ -40,12 +38,19 @@ variable "compartment_ocid" {
   type        = string
 }
 
+variable "subnet_id" {
+  description = "The OCID of the subnet"
+  type        = string
+}
+
 variable "instance_display_name" {
   description = "The display name of the instance"
   type        = string
   default     = "my-instance"
 }
------------------------------------------------------
+
+
+
 # terraform.tfvars
 tenancy_ocid     = "ocid1.tenancy.oc1..exampleuniqueID"
 user_ocid        = "ocid1.user.oc1..exampleuniqueID"
@@ -53,13 +58,14 @@ fingerprint      = "example:fingerprint"
 private_key_path = "/path/to/your/private_key.pem"
 region           = "us-phoenix-1"
 compartment_ocid = "ocid1.compartment.oc1..exampleuniqueID"
-------------------------------------------------------------------
+subnet_id        = "ocid1.subnet.oc1..exampleuniqueID"
+
 
 # locals.tf
 locals {
   instance_shape = "VM.Standard.E2.1.Micro"
 }
--------------------------------------------------------------------------
+
 
 # data_sources.tf
 data "oci_identity_availability_domains" "ads" {
@@ -67,18 +73,25 @@ data "oci_identity_availability_domains" "ads" {
 }
 
 data "oci_core_images" "default_image" {
-  compartment_id = var.compartment_ocid
-  operating_system = "Oracle Linux"
+  compartment_id         = var.compartment_ocid
+  operating_system       = "Oracle Linux"
   operating_system_version = "7.9"
-  most_recent = true
+  most_recent            = true
 }
-------------------
+
+data "oci_core_fault_domains" "fds" {
+  availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
+  compartment_id      = var.compartment_ocid
+}
+
+
 # main.tf
 resource "oci_core_instance" "instance" {
   availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
   compartment_id      = var.compartment_ocid
   shape               = local.instance_shape
   display_name        = var.instance_display_name
+  fault_domain        = data.oci_core_fault_domains.fds.fault_domains[0].name
 
   create_vnic_details {
     subnet_id = var.subnet_id
@@ -89,7 +102,8 @@ resource "oci_core_instance" "instance" {
     source_id   = data.oci_core_images.default_image.images[0].id
   }
 }
-----------------------------------------
+
+
 # outputs.tf
 output "instance_id" {
   value = oci_core_instance.instance.id
