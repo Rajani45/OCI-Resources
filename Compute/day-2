@@ -1,0 +1,124 @@
+provider "oci" {
+  tenancy_ocid     = var.tenancy_ocid
+  user_ocid        = var.user_ocid
+  fingerprint      = var.fingerprint
+  private_key_path = var.private_key_path
+  region           = var.region
+}
+-----------------------------------------------
+
+  variable "tenancy_ocid" {
+  description = "The OCID of your tenancy."
+  type        = string
+}
+
+variable "user_ocid" {
+  description = "The OCID of the user calling the API."
+  type        = string
+}
+
+variable "fingerprint" {
+  description = "The fingerprint of the API key."
+  type        = string
+}
+
+variable "private_key_path" {
+  description = "The path to the private key."
+  type        = string
+}
+
+variable "region" {
+  description = "The region to connect to."
+  type        = string
+  default     = "us-ashburn-1"
+}
+
+variable "compartment_ocid" {
+  description = "The OCID of the compartment."
+  type        = string
+}
+
+variable "availability_domain" {
+  description = "The availability domain to launch the instance in."
+  type        = string
+}
+
+variable "fault_domain" {
+  description = "The fault domain to launch the instance in."
+  type        = string
+  default     = "FAULT-DOMAIN-1"
+}
+
+variable "instance_shape" {
+  description = "The shape of the instance."
+  type        = string
+  default     = "VM.Standard2.1"
+}
+
+variable "image_ocid" {
+  description = "The OCID of the image to use."
+  type        = string
+}
+
+variable "ssh_public_key" {
+  description = "The SSH public key to use for the instance."
+  type        = string
+}
+----------------------------------------------------------------------------
+
+  tenancy_ocid        = "ocid1.tenancy.oc1..example"
+user_ocid           = "ocid1.user.oc1..example"
+fingerprint         = "your_fingerprint"
+private_key_path    = "/path/to/your/private_key.pem"
+region              = "us-ashburn-1"
+compartment_ocid    = "ocid1.compartment.oc1..example"
+availability_domain = "ocid1.availabilitydomain.oc1..example"
+fault_domain        = "FAULT-DOMAIN-1"
+instance_shape      = "VM.Standard2.1"
+image_ocid          = "ocid1.image.oc1..example"
+ssh_public_key      = "ssh-rsa AAAA..."
+------------------------------------------------------------
+
+  locals {
+  instance_name = "my-compute-instance"
+}
+-----------------------------------------------------------------------
+  data "oci_core_subnet" "my_subnet" {
+  compartment_id = var.compartment_ocid
+  display_name   = "my_subnet"
+}
+--------------------------------------------------------------------------------
+
+  resource "oci_core_instance" "my_instance" {
+  availability_domain = var.availability_domain
+  compartment_id      = var.compartment_ocid
+  shape               = var.instance_shape
+  display_name        = local.instance_name
+  fault_domain        = var.fault_domain
+
+  create_vnic_details {
+    subnet_id       = data.oci_core_subnet.my_subnet.id
+    assign_public_ip = true
+  }
+
+  source_details {
+    source_type = "image"
+    source_id   = var.image_ocid
+  }
+
+  metadata = {
+    ssh_authorized_keys = var.ssh_public_key
+  }
+}
+---------------------------------------------------------------------------
+output "instance_id" {
+  description = "The OCID of the compute instance."
+  value       = oci_core_instance.my_instance.id
+}
+
+output "instance_public_ip" {
+  description = "The public IP address of the compute instance."
+  value       = oci_core_instance.my_instance.public_ip
+}
+-------------------------------------------------------------------------------------
+  
